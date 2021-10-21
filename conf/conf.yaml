@@ -1,0 +1,36 @@
+data:
+  data_path: data/BTC_42.csv
+  column: best_threshold_zscore
+  max_seq_length: 42
+  eval_ratio: 0.2
+model:
+  hidden_size: 128
+  num_layers: 2
+  dropout: 0.2
+train:
+  dataloader_kwargs:
+    batch_size: 1024
+    num_workers: 4
+    drop_last: False
+  optim_conf:
+    lr: 1.0e-4
+    betas: [0.9, 0.999]
+    eps: 1.0e-8
+    weight_decay: 0
+  trainer:
+    log_every_n_steps: 1
+    accumulate_grad_batches: 1
+    max_epochs: 1000
+    default_root_dir: output
+    deterministic: True
+    gradient_clip_val: 1
+    precision: 16
+    accelerator: ddp
+    num_nodes: 1
+callback:
+  model_checkpoint:
+    - filename: "{dev/acc:.4e}{epoch}"
+      monitor: "dev/acc"
+      save_top_k: 3
+      mode: max
+      every_n_val_epochs: 1
